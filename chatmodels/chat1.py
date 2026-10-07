@@ -13,6 +13,6 @@ load_dotenv()
 from langchain_groq import ChatGroq
 model = ChatGroq(model="openai/gpt-oss-120b",temperature=0)
 
-response = model.invoke("what you thimk about Arya college of engineering, jaipur?")
+response = model.invoke("What is Python?")
 print(response.content)
 # -------------------------------------------
