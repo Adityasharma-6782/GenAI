@@ -1,11 +1,11 @@
-from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
 load_dotenv()
 
-model = ChatGroq(model = "openai/gpt-oss-120b", temperature=1)
+model = ChatGoogleGenerativeAI(model = "gemini-3.7-flash", temperature=1)
 
 print("press 0 for normal")
 print("press 1 for logical")

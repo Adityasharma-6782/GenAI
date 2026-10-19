@@ -7,55 +7,41 @@ load_dotenv()
 
 model = ChatGroq(model="openai/gpt-oss-120b")
 
+from pydantic import BaseModel
+from typing import List, Optional
+
+class Movie(BaseModel):
+    title: str
+    release_year: Optional[int]
+    genre: List[str]
+    director: Optional[str]
+    cast: List[str]
+    rating: Optional[float]
+    summary: str
+
+from langchain_core.output_parsers import PydanticOutputParser
+
+parser = PydanticOutputParser(pydantic_object=Movie)
+
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system",
-         """You are an intelligent movies information extraction AI.
-
-            Analyze the following paragraph and extract useful information.
-
-            Rules:
-            - Extract only information explicitly present in the paragraph.
-            - Never hallucinate or infer unsupported facts.
-            - Ignore irrelevant details.
-            - Preserve important context.
-            - If information is unavailable, return null.
-            - Keep the summary concise.
-            - Return ONLY valid JSON.
-            - Do not use Markdown.
-            - Do not add explanations outside the JSON.
-
-            Output schema:
-
-            {{
-              "main_topic": "",
-              "summary": "",
-              "key_points": [],
-              "people": [],
-              "organizations": [],
-              "locations": [],
-              "products_or_technologies": [],
-              "dates": [],
-              "numbers_and_statistics": [],
-              "events": [],
-              "relationships": [],
-              "keywords": [],
-              "missing_information": []
-            }}
+            """
+            You are a professional information extraction assistant
+            specializing in movie-related content.
+            {fotmat_instruction}
             """
          ),
-         ("human",
-          """Extarct information from this Paragraph:
-            {paragraph}
-            """
-          )
+         ("human","{paragraph}")
     ]
 )
 
 para = input("Enter Paragraph: ")
 
 final_prompt = prompt.invoke(
-    {"paragraph" : para}
+    {"paragraph" : para,
+     "fotmat_instruction" : parser.get_config_jsonschema()
+    }
 )
 
 response = model.invoke(final_prompt)
